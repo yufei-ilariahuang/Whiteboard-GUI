@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FreeDraw implements Shape {
-    private List<Point> points = new ArrayList<>();
+    private List<Point> points = new ArrayList<>();  // Store all points
     private Color color;
-    public FreeDraw(){
-        this.color=Color.BLACK;
+
+    public FreeDraw() {
+        this.color = Color.BLACK;
     }
 
     public FreeDraw(Color color) {
@@ -30,22 +31,25 @@ public class FreeDraw implements Shape {
     }
 
     @Override
-    public Color getColor() {
-        return color;
-    }
-
-    @Override
     public ShapeType getType() {
-        return null;
+        return ShapeType.FreeDraw; // Ensure this is correctly implemented in your ShapeType enum
     }
 
     @Override
     public Point getStart() {
-        return null;
+        return points.isEmpty() ? null : points.get(0);
     }
 
     @Override
-    public void setColor(Color newColor) {
+    public void setColor(Color color) {
         this.color = color;
+    }
+
+    @Override
+    public Color getColor() {
+        return color;
+    }
+    public void clearPoints() {
+        points.clear();  // Clear all points in the free draw
     }
 }

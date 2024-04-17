@@ -48,25 +48,41 @@ public class Whiteboard extends JFrame {
 
   private void setupDrawingPanelInteractions() {
     drawingPanel.addMouseListener(new MouseAdapter() {
-
       @Override
       public void mousePressed(MouseEvent e) {
         int x = e.getX();
         int y = e.getY();
-        if (!drawingMode) {
-          drawingMode = true;
-
-          initiateShape(x, y); // Start a new shape at the click coordinates
-        }else {
-          drawingMode = false;
-          updateShape(x, y);// Disable drawing mode, shape is finalized on second click
-          drawingPanel.repaint();
+        if(currentShape instanceof FreeDraw){
+          if (!drawingMode) {
+            drawingMode = true;
+            currentShape = new FreeDraw(currentColor);
+            drawingPanel.add(currentShape);
           }
+          ((FreeDraw) currentShape).addPoint(e.getPoint());
+          currentShape.setColor(currentColor);
+          drawingPanel.add(currentShape);
+          drawingPanel.repaint();
+        }else{
+          if (!drawingMode) {
+            drawingMode = true;
+
+            initiateShape(x, y); // Start a new shape at the click coordinates
+          }else {
+            drawingMode = false;
+            updateShape(x, y);// Disable drawing mode, shape is finalized on second click
+            drawingPanel.repaint();
+          }
+        }
       }
       @Override
       public void mouseDragged(MouseEvent e) {
-        if (drawingMode && currentShape != null) {
-          updateShape(e.getX(), e.getY());
+        int x = e.getX();
+        int y = e.getY();
+        if (drawingMode && currentShape instanceof FreeDraw) {
+          ((FreeDraw) currentShape).addPoint(e.getPoint());
+          drawingPanel.repaint(); // Repaint to update the drawing
+        }else if (drawingMode && currentShape != null) {
+          updateShape(x,y);
           drawingPanel.repaint();
         }
       }
@@ -122,7 +138,8 @@ public class Whiteboard extends JFrame {
 
   private void switchToFreeDraw() {
     drawingMode = true;
-    currentShape = new FreeDraw(currentColor);
+    currentShape = new FreeDraw();
+
   }
 
 
@@ -142,6 +159,7 @@ public class Whiteboard extends JFrame {
   private void undoLastAction() {
     drawingPanel.removeLastShape();  // Call the method to remove the last shape
   }
+
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> new Whiteboard().setVisible(true));
   }
