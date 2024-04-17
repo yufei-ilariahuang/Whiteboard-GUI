@@ -9,4 +9,6 @@ public interface Shape {
     ShapeType getType();
 
     Point getStart();
+
+    void setColor(Color newColor);
 }

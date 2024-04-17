@@ -8,18 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DrawingPanel extends JPanel {
-    private List<Model.Shape> shapes = new ArrayList<>();
-    private Model.Shape currentShape;
+    private List<Shape> shapes = new ArrayList<>();
+    private Shape currentShape;
+
     public DrawingPanel() {
         super();
         setPreferredSize(new Dimension(600, 600)); // Optionally set preferred size here
     }
-    public void addShape(Shape shape) {
+
+    public void add(Shape shape) {
         shapes.add(shape);
         repaint();
     }
 
-    public void setCurrentShape(Model.Shape shape) {
+    public void setCurrentShape(Shape shape) {
         currentShape = shape;
         repaint();
     }
@@ -33,11 +35,18 @@ public class DrawingPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        for (Model.Shape shape : shapes) {
+        for (Shape shape : shapes) {
             shape.draw(g);
         }
         if (currentShape != null) {
             currentShape.draw(g);
         }
     }
+    public void removeLastShape() {
+        if (!shapes.isEmpty()) {
+            shapes.remove(shapes.size() - 1);
+            repaint();
+        }
+    }
+
 }
