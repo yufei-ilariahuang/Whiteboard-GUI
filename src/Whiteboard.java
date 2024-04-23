@@ -158,6 +158,13 @@ public class Whiteboard extends JFrame {
       currentShape = null; // Reset currentShape
       drawingPanel.repaint();
     });
+    JButton undoButton = new JButton("Undo");
+    undoButton.addActionListener(e -> {
+      if (!shapes.isEmpty()) {
+        shapes.remove(shapes.size() - 1);
+        drawingPanel.repaint();
+      }
+    });
 
     JPanel buttonPanel = new JPanel();
     buttonPanel.add(lineButton);
@@ -168,6 +175,7 @@ public class Whiteboard extends JFrame {
     buttonPanel.add(fillToggleButton);
     buttonPanel.add(colorButton);
     buttonPanel.add(clearButton);
+    buttonPanel.add(undoButton);
 
     getContentPane().setLayout(new BorderLayout());
     getContentPane().add(drawingPanel, BorderLayout.CENTER);
