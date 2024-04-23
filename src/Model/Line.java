@@ -1,54 +1,45 @@
 package Model;
-
 import java.awt.*;
 
 public class Line implements Shape {
     private Point start;
     private Point end;
     private Color color;
-    public Line(){
-        this.color = Color.BLACK;
-    }
-    public Line(int x1, int y1,Color color){
-        this.start = new Point(x1, y1);
-        this.end = new Point(x1, y1);
-        this.color=color;
-    }
+    private boolean fill;
 
-    // Removed the redundant constructor
-    public Line(int x1, int y1, int x2, int y2, Color color) {
-        this.start = new Point(x1, y1);
-        this.end = new Point(x2, y2);
+    public Line(Color color, boolean fill) {
         this.color = color;
+        this.fill = fill;
     }
 
-    @Override
-    public void draw(Graphics g) {
-        if (start != null && end != null) {
-            g.setColor(color); // Set color before drawing
-            g.drawLine(start.x, start.y, end.x, end.y);
-        }
-    }
-
-    @Override
-    public ShapeType getType() {
-        return ShapeType.LINE;
-    }
-
-    @Override
-    public Point getStart() {
-        return start;
+    public Line(int x1, int y1, int x2, int y2, Color color, boolean fill) {
+        start = new Point(x1, y1);
+        end = new Point(x2, y2);
+        this.color = color;
+        this.fill = fill;
     }
 
     public void setEnd(Point end) {
         this.end = end;
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    @Override
+    public void draw(Graphics g) {
+        if (start != null && end != null) {
+            g.setColor(color);
+            if (fill) {
+                g.drawLine(start.x, start.y, end.x, end.y);
+            } else {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setStroke(new BasicStroke(2)); // Set thicker stroke for unfilled shape
+                g2d.drawLine(start.x, start.y, end.x, end.y);
+                g2d.dispose();
+            }
+        }
     }
 
-    public Color getColor() {
-        return color;
+    @Override
+    public ShapeType getType() {
+        return ShapeType.LINE;
     }
 }

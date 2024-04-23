@@ -1,17 +1,17 @@
 package Model;
 import java.awt.*;
 
-public class Rectangle implements Shape {
+public class Ellipse implements Shape {
     private int x, y, width, height;
     private Color color;
     private boolean fill;
 
-    public Rectangle(Color color, boolean fill) {
+    public Ellipse(Color color, boolean fill) {
         this.color = color;
         this.fill = fill;
     }
 
-    public Rectangle(int x, int y, int width, int height, Color color, boolean fill) {
+    public Ellipse(int x, int y, int width, int height, Color color, boolean fill) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -37,14 +37,14 @@ public class Rectangle implements Shape {
     public void draw(Graphics g) {
         g.setColor(color);
         if (fill) {
-            g.fillRect(x, y, width, height);
+            g.fillOval(x, y, width, height);
         } else {
-            g.drawRect(x, y, width, height);
+            g.drawOval(x, y, width, height);
         }
     }
 
     @Override
     public ShapeType getType() {
-        return ShapeType.RECTANGLE;
+        return ShapeType.ELLIPSE;
     }
 }

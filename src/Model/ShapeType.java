@@ -1,5 +1,6 @@
 package Model;
 
 public enum ShapeType {
-    LINE, CIRCLE, RECTANGLE,FreeDraw
+    LINE, CIRCLE, RECTANGLE, ELLIPSE
 }
+

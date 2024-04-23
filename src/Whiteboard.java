@@ -1,167 +1,184 @@
 import Model.Rectangle;
 import Model.Shape;
 import Model.*;
-import View.ButtonPanel;
-import View.DrawingPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Whiteboard extends JFrame {
-  private DrawingPanel drawingPanel;
-  private Color currentColor = Color.BLACK; // Default color
+  private JPanel drawingPanel;
+  private List<Shape> shapes = new ArrayList<>();
   private Shape currentShape;
   private boolean drawingMode = false;
-
-  private static final int FIXED_SHAPE_SIZE = 100; // Define the fixed size of the shapes
+  private boolean freeDrawMode = false;
+  private boolean fillMode = false;
+  private Color currentColor = Color.BLACK; // Default color
+  private Point startPoint; // For dragging to determine shape size
 
   public Whiteboard() {
     setTitle("Whiteboard");
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setupUI();
-    pack();
-    setLocationRelativeTo(null);
-    setVisible(true);
-  }
 
-  private void setupUI() {
-    drawingPanel = new DrawingPanel();
+    drawingPanel = new JPanel() {
+      @Override
+      protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        for (Shape shape : shapes) {
+          shape.draw(g);
+        }
+        if (currentShape != null && !freeDrawMode) {
+          currentShape.draw(g);
+        }
+      }
+    };
     drawingPanel.setBackground(Color.WHITE);
-    drawingPanel.setPreferredSize(new Dimension(600, 600));
-    ButtonPanel buttonPanel = new ButtonPanel(
-              e -> switchToShape(e.getActionCommand()),
-              e -> switchToFreeDraw(),
-              e -> chooseColor(),
-              e -> clearDrawing(),
-              e -> undoLastAction()
-    );
-    getContentPane().setLayout(new BorderLayout());
-    getContentPane().add(drawingPanel, BorderLayout.CENTER);
-    getContentPane().add(buttonPanel, BorderLayout.NORTH);
-
-    setupDrawingPanelInteractions();
-  }
-
-
-
-  private void setupDrawingPanelInteractions() {
+    drawingPanel.setPreferredSize(new Dimension(400, 400));
     drawingPanel.addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-        if(currentShape instanceof FreeDraw){
-          if (!drawingMode) {
-            drawingMode = true;
-            currentShape = new FreeDraw(currentColor);
-            drawingPanel.add(currentShape);
+        if (freeDrawMode) {
+          currentShape = new FreeDraw(currentColor);
+          shapes.add(currentShape);
+          ((FreeDraw) currentShape).addPoint(e.getX(), e.getY());
+        } else if (drawingMode && currentShape != null) {
+          startPoint = e.getPoint(); // Store the starting point for dragging
+          switch (currentShape.getType()) {
+            case LINE:
+              currentShape = new Line(startPoint.x, startPoint.y, startPoint.x + 100, startPoint.y, currentColor, fillMode);
+              break;
+            case CIRCLE:
+              currentShape = new Circle(startPoint.x, startPoint.y, 100, currentColor, fillMode);
+              break;
+            case RECTANGLE:
+              currentShape = new Rectangle(startPoint.x, startPoint.y, 100, 100, currentColor, fillMode);
+              break;
+            case ELLIPSE:
+              // Create a fixed-size ellipse at the click point
+              currentShape = new Ellipse(startPoint.x - 75, startPoint.y - 50, 150, 100, currentColor, fillMode);
+              break;
           }
-          ((FreeDraw) currentShape).addPoint(e.getPoint());
-          currentShape.setColor(currentColor);
-          drawingPanel.add(currentShape);
-          drawingPanel.repaint();
-        }else{
-          if (!drawingMode) {
-            drawingMode = true;
+          shapes.add(currentShape);
+        }
+        drawingPanel.repaint();
+      }
 
-            initiateShape(x, y); // Start a new shape at the click coordinates
-          }else {
-            drawingMode = false;
-            updateShape(x, y);// Disable drawing mode, shape is finalized on second click
-            drawingPanel.repaint();
-          }
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        if (freeDrawMode && currentShape != null) {
+          currentShape = new FreeDraw(currentColor); // Create a new FreeDraw object for continuous drawing
+          shapes.add(currentShape);
         }
       }
+    });
+
+    drawingPanel.addMouseMotionListener(new MouseAdapter() {
       @Override
       public void mouseDragged(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-        if (drawingMode && currentShape instanceof FreeDraw) {
-          ((FreeDraw) currentShape).addPoint(e.getPoint());
-          drawingPanel.repaint(); // Repaint to update the drawing
-        }else if (drawingMode && currentShape != null) {
-          updateShape(x,y);
+        if (drawingMode && currentShape != null) {
+          if (currentShape instanceof Line) {
+            ((Line) currentShape).setEnd(e.getPoint());
+          } else if (currentShape instanceof Circle) {
+            int radius = (int) Math.sqrt(Math.pow(e.getX() - startPoint.x, 2) + Math.pow(e.getY() - startPoint.y, 2));
+            ((Circle) currentShape).setRadius(radius);
+          } else if (currentShape instanceof Rectangle) {
+            int width = Math.abs(e.getX() - startPoint.x);
+            int height = Math.abs(e.getY() - startPoint.y);
+            ((Rectangle) currentShape).setWidth(width);
+            ((Rectangle) currentShape).setHeight(height);
+            ((Rectangle) currentShape).setLocation(Math.min(startPoint.x, e.getX()), Math.min(startPoint.y, e.getY()));
+          } else if (currentShape instanceof Ellipse) {
+            int width = Math.abs(e.getX() - startPoint.x);
+            int height = Math.abs(e.getY() - startPoint.y);
+            ((Ellipse) currentShape).setWidth(width);
+            ((Ellipse) currentShape).setHeight(height);
+            ((Ellipse) currentShape).setLocation(Math.min(startPoint.x, e.getX()), Math.min(startPoint.y, e.getY()));
+          }
+          drawingPanel.repaint();
+        } else if (freeDrawMode && currentShape != null) {
+          ((FreeDraw) currentShape).addPoint(e.getX(), e.getY());
           drawingPanel.repaint();
         }
       }
     });
 
-  }
-  private void initiateShape(int x, int y) {
-    if (currentShape != null) {
+    JButton lineButton = new JButton("Line");
+    lineButton.addActionListener(e -> {
+      drawingMode = true;
+      freeDrawMode = false;
+      currentShape = new Line(currentColor, fillMode);
+    });
 
-      switch (currentShape.getType()) {
-        case LINE:
-          currentShape = new Line(x, y,currentColor);
-          break;
-        case CIRCLE:
-          currentShape = new Circle(x, y,currentColor);
-          break;
-        case RECTANGLE:
-          currentShape = new Rectangle(x, y,currentColor);
-          break;
+    JButton circleButton = new JButton("Circle");
+    circleButton.addActionListener(e -> {
+      drawingMode = true;
+      freeDrawMode = false;
+      currentShape = new Circle(currentColor, fillMode);
+    });
+
+    JButton rectangleButton = new JButton("Rectangle");
+    rectangleButton.addActionListener(e -> {
+      drawingMode = true;
+      freeDrawMode = false;
+      currentShape = new Rectangle(currentColor, fillMode);
+    });
+
+    JButton ellipseButton = new JButton("Ellipse");
+    ellipseButton.addActionListener(e -> {
+      drawingMode = true;
+      freeDrawMode = false;
+      currentShape = new Ellipse(currentColor, fillMode);
+    });
+
+    JButton freeDrawButton = new JButton("Free Draw");
+    freeDrawButton.addActionListener(e -> {
+      drawingMode = false;
+      freeDrawMode = true;
+    });
+
+    JToggleButton fillToggleButton = new JToggleButton("Fill");
+    fillToggleButton.addItemListener(e -> {
+      fillMode = fillToggleButton.isSelected();
+    });
+
+    JButton colorButton = new JButton("Color");
+    colorButton.addActionListener(e -> {
+      Color selectedColor = JColorChooser.showDialog(null, "Select Color", currentColor);
+      if (selectedColor != null) {
+        currentColor = selectedColor;
       }
-      drawingPanel.add(currentShape); // Add the newly started shape to the list
-    }
-  }
+    });
 
-  private void updateShape(int x, int y) {
-    // Calculate differences once, use many times.
-    Point end = new Point(x, y);
+    JButton clearButton = new JButton("Clear");
+    clearButton.addActionListener(e -> {
+      shapes.clear();
+      currentShape = null; // Reset currentShape
+      drawingPanel.repaint();
+    });
 
-    if (currentShape instanceof Line) {
-      ((Line) currentShape).setEnd(end);
-    } else if (currentShape instanceof Circle) {
-      // The distance formula calculates the radius directly.
-      ((Circle) currentShape).setEnd(end);
-    } else if (currentShape instanceof Rectangle) {
-      ((Rectangle) currentShape).setEnd(end);
-    }
-  }
-  private void switchToShape(String command) {
-    drawingMode = true;
-    switch (command) {
-      case "Line":
-        currentShape = new Line();
-        break;
-      case "Circle":
-        currentShape = new Circle();
-        break;
-      case "Rectangle":
-        currentShape = new Rectangle();
-        break;
-    }
-  }
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.add(lineButton);
+    buttonPanel.add(circleButton);
+    buttonPanel.add(rectangleButton);
+    buttonPanel.add(ellipseButton);
+    buttonPanel.add(freeDrawButton);
+    buttonPanel.add(fillToggleButton);
+    buttonPanel.add(colorButton);
+    buttonPanel.add(clearButton);
 
+    getContentPane().setLayout(new BorderLayout());
+    getContentPane().add(drawingPanel, BorderLayout.CENTER);
+    getContentPane().add(buttonPanel, BorderLayout.NORTH);
 
-  private void switchToFreeDraw() {
-    drawingMode = true;
-    currentShape = new FreeDraw();
-
-  }
-
-
-  private void chooseColor() {
-    Color newColor = JColorChooser.showDialog(this, "Choose a color", currentColor);
-    if (newColor != null) {
-      currentColor = newColor;
-    }
-  }
-  private void clearDrawing() {
-    // Clear the list of shapes
-    drawingPanel.clearShapes();
-
-    // Repaint the drawing panel to reflect the cleared drawing
-    drawingPanel.repaint();
-  }
-  private void undoLastAction() {
-    drawingPanel.removeLastShape();  // Call the method to remove the last shape
+    pack();
+    setLocationRelativeTo(null);
   }
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> new Whiteboard().setVisible(true));
   }
-
 }
+
