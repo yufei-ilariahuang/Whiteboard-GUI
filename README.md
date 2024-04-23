@@ -15,9 +15,9 @@ The Whiteboard application is a Java-based interactive drawing software. It empo
 - Facility to clear the drawing area with a single action
 
 ## Usage
-by Clone using the web URL.
-by run .jar file
-Users can select the drawing mode via the UI buttons, adjust colors with a color chooser, and toggle the fill mode for shapes. The application translates user interactions into graphical representations.
+- by Clone using the web URL:https://github.com/yufei-ilariahuang/Whiteboard-GUI.git
+- by run .jar file
+- Users can select the drawing mode via the UI buttons, adjust colors with a color chooser, and toggle the fill mode for shapes. The application translates user interactions into graphical representations.
 
 ## Design Evaluation
 
