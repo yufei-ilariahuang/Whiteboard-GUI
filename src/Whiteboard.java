@@ -1,3 +1,7 @@
+import Model.Rectangle;
+import Model.Shape;
+import Model.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
