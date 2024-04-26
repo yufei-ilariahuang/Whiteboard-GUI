@@ -41,12 +41,12 @@ OR run .jar file
 ## Usage
 Upon launching the Whiteboard, you will see a window with a drawing area and a panel of control buttons at the top.
 
-To draw a shape: Select the desired shape button and click on the drawing area to place the shape. You can drag the mouse to resize the shape.
-Freehand Drawing: Select the "Free Draw" button and freely draw on the canvas by holding down the left mouse button.
-Change Color: Click the "Color" button to open a color picker dialog and select a color.
-Fill Shapes: Toggle the "Fill" button to fill the shapes with the selected color.
-Undo: Click the "Undo" button to remove the last drawn shape.
-Clear: Press the "Clear" button to clear all shapes from the drawing area.
+- To draw a shape: Select the desired shape button and click on the drawing area to place the shape. You can drag the mouse to resize the shape.
+- Freehand Drawing: Select the "Free Draw" button and freely draw on the canvas by holding down the left mouse button.
+- Change Color: Click the "Color" button to open a color picker dialog and select a color.
+- Fill Shapes: Toggle the "Fill" button to fill the shapes with the selected color.
+- Undo: Click the "Undo" button to remove the last drawn shape.
+- Clear: Press the "Clear" button to clear all shapes from the drawing area.
 
 ## License
 This project is licensed under the MIT License - see the LICENSE.md file for details.
