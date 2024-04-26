@@ -53,6 +53,8 @@ public class Whiteboard extends JFrame {
      * @param e the MouseEvent containing details about the mouse press action
      */
     drawingPanel.addMouseListener(new MouseAdapter() {
+
+
       @Override
       public void mousePressed(MouseEvent e) {
         if (freeDrawMode) {
@@ -208,10 +210,16 @@ public class Whiteboard extends JFrame {
      */
     JButton clearButton = new JButton("Clear");
     clearButton.addActionListener(e -> {
-      shapes.clear();
-      currentShape = null; // Reset currentShape
-      drawingPanel.repaint();
+      if (shapes.isEmpty()) {
+        // Show error message if there are no shapes to clear
+        JOptionPane.showMessageDialog(null, "The drawing area is already clear.", "Clear Error", JOptionPane.ERROR_MESSAGE);
+      } else {
+        shapes.clear();
+        currentShape = null; // Reset currentShape
+        drawingPanel.repaint();
+      }
     });
+
     /**
      * Removes the most recently added shape from the drawing list, effectively undoing the last drawing action.
      * This action can be repeated until all shapes are removed.
@@ -221,8 +229,18 @@ public class Whiteboard extends JFrame {
     JButton undoButton = new JButton("Undo");
     undoButton.addActionListener(e -> {
       if (!shapes.isEmpty()) {
-        shapes.remove(shapes.size() - 1);
+//        for (Shape shape : shapes) {
+//          System.out.println("1"+ shape);
+//        }
+        shapes.removeLast();
+//        for (Shape shape : shapes) {
+//          System.out.println("2"+ shape);
+//        }
+        currentShape = null;
         drawingPanel.repaint();
+      } else {
+        JOptionPane.showMessageDialog(null, "The drawing area is already clear.", "Clear Error", JOptionPane.ERROR_MESSAGE);
+
       }
     });
 
@@ -258,4 +276,5 @@ public class Whiteboard extends JFrame {
     SwingUtilities.invokeLater(() -> new Whiteboard().setVisible(true));
   }
 }
+
 
