@@ -9,10 +9,22 @@ The Whiteboard application is a Java-based interactive drawing software. It empo
 - Java Runtime Environment (JRE) 8 or higher
 - Standard Java AWT and Swing libraries
 #### Steps
-1. Clone the repository or download the source code: https://github.com/yufei-ilariahuang/Whiteboard-GUI.git
-2. Navigate to the source code directory:src/Main.java
-3. Compile the Java code:javac Main.java
-4. Run the application: java Main
+1. Clone the repository or download the source code:
+   ```bash
+     https://github.com/yufei-ilariahuang/Whiteboard-GUI.git
+   ```
+3. Navigate to the source code directory:
+   ```bash
+    src/Main.java
+   ```
+5. Compile the Java code:
+   ```bash
+    javac Main.java
+   ```
+7. Run the application:
+   ```bash
+    javac Main
+   ```
 OR run .jar file
 
 ## Features
